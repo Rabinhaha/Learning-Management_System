@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:3000/api/auth";
+const BASE_URL = "https://your-backend-name.onrender.com/api/auth"; // 👈 use your Render backend URL
 
 // Save token in localStorage
 export const setAuthToken = (token) => {
