@@ -7,6 +7,9 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Name is required"],
       trim: true,
+      minlength: [2, "Name must be at least 2 characters"],
+      maxlength: [50, "Name cannot exceed 50 characters"],
+      match: [/^[a-zA-Z\s]*$/, "Name can only contain letters and spaces"],
     },
     email: {
       type: String,
@@ -14,11 +17,13 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
+      match: [/^[^@]+@[^@]+\.[^@]+$/, "Invalid email format"],
     },
     password: {
       type: String,
       required: [true, "Password is required"],
-      minlength: 6,
+      minlength: [8, "Password must be at least 8 characters"],
+      trim: true,
     },
     role: {
       type: String,
@@ -29,7 +34,6 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Hash password before saving
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   const salt = await bcrypt.genSalt(10);
@@ -37,7 +41,6 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-// Compare password method
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
