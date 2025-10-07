@@ -15,9 +15,13 @@ export default function Auth() {
     e.preventDefault();
     try {
       const data = isLogin ? await login(form) : await register(form);
+      console.log("Auth response:", data); // Debug
+      console.log("Token in localStorage:", localStorage.getItem("token")); // Debug
+      console.log("User in localStorage:", localStorage.getItem("user")); // Debug
       alert(isLogin ? "Login successful!" : "Registration successful!");
-      navigate("/Dashboard");
+      setTimeout(() => navigate("/Dashboard"), 0); // Delay navigation
     } catch (err) {
+      console.error("Auth error:", err.message); // Debug
       alert(err.message || "Something went wrong");
     }
   };
