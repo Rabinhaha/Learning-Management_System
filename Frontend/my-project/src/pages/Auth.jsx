@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { login, register } from "../utils/api";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const [form, setForm] = useState({ email: "", password: "", name: "" });
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -10,32 +13,18 @@ export default function Auth() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      const url = isLogin
-        ? "http://localhost:3000/api/auth/login"
-        : "http://localhost:3000/api/auth/register";
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.message || "Something went wrong");
-
-      localStorage.setItem("token", data.token); // store JWT
-      alert(isLogin ? "Login successful" : "Registration complete!");
-      window.location.href = "/dashboard"; // redirect
+      const data = isLogin ? await login(form) : await register(form);
+      alert(isLogin ? "Login successful!" : "Registration successful!");
+      navigate("/Dashboard");
     } catch (err) {
-      alert(err.message); // show real error from backend
+      alert(err.message || "Something went wrong");
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <div className="bg-black p-8 rounded-lg shadow-md w-full max-w-md">
+      <div className="bg-black p-8 rounded-lg shadow-md w-full max-w-md text-white">
         <h1 className="text-2xl font-bold text-center mb-6">
           {isLogin ? "Login" : "Register"}
         </h1>
@@ -47,7 +36,7 @@ export default function Auth() {
               placeholder="Full Name"
               value={form.name}
               onChange={handleChange}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded text-white"
               required
             />
           )}
@@ -57,7 +46,7 @@ export default function Auth() {
             placeholder="Email"
             value={form.email}
             onChange={handleChange}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded text-white"
             required
           />
           <input
@@ -66,7 +55,7 @@ export default function Auth() {
             placeholder="Password"
             value={form.password}
             onChange={handleChange}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded text-white"
             required
           />
           <button
@@ -81,7 +70,7 @@ export default function Auth() {
           <button
             type="button"
             onClick={() => setIsLogin(!isLogin)}
-            className="text-blue-500 underline"
+            className="text-blue-400 underline"
           >
             {isLogin ? "Register" : "Login"}
           </button>
