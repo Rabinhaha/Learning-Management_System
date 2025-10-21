@@ -18,7 +18,7 @@ export default function Sidebar() {
 
   return (
     <aside className="fixed top-0 left-0 h-screen w-64 bg-gray-800 text-white flex flex-col p-4 z-10">
-      <h2 className="text-2xl font-bold mb-6">LMS Portal</h2>
+      <h2 className="text-2xl font-bold mb-6">Lms</h2>
       <nav className="flex-1">
         <ul className="space-y-2">
           {navItems.map((item) => (
