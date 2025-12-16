@@ -1,45 +1,61 @@
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import Sidebar from "../components/Sidebar.jsx";
+import { getCourses } from "../utils/api.jsx";
 
 export default function Courses() {
-  // Dummy course data
-  const courses = [
-    { id: 1, title: "Web Development Basics", instructor: "John Doe" },
-    { id: 2, title: "React for Beginners", instructor: "Jane Smith" },
-    { id: 3, title: "Advanced Node.js", instructor: "David Kim" },
-    { id: 4, title: "UI/UX Design Principles", instructor: "Emily Johnson" },
-    { id: 5, title: "Database Management", instructor: "Michael Lee" },
-    { id: 6, title: "Python for Data Science", instructor: "Sophia Brown" },
-    { id: 7, title: "Mobile App Development", instructor: "Chris White" },
-    { id: 8, title: "Cybersecurity Fundamentals", instructor: "Laura Green" },
-    { id: 9, title: "Cloud Computing 101", instructor: "Robert Wilson" },
-    { id: 10, title: "Machine Learning Basics", instructor: "Olivia Davis" },
-  ];
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const data = await getCourses();
+        setCourses(data);
+      } catch (err) {
+        console.error("Error fetching courses:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourses();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen bg-gray-900 text-white items-center justify-center">
+        Loading courses...
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-900">
       <Sidebar />
-
-      {/* Main Content */}
       <div className="flex-1 flex flex-col text-white p-8 ml-64">
         <h1 className="text-4xl font-bold mb-2 text-center">Courses</h1>
         <p className="text-lg text-center mb-8">
           Browse and manage your courses here.
         </p>
 
-        {/* Course Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {courses.map((course) => (
             <div
-              key={course.id}
+              key={course._id}
               className="bg-gray-800 rounded-2xl shadow-lg p-6 hover:bg-gray-700 transition-all duration-300"
             >
               <h2 className="text-2xl font-semibold mb-2">{course.title}</h2>
-              <p className="text-gray-400 mb-4">
-                Instructor: {course.instructor}
+              <p className="text-gray-400 mb-2">
+                Instructor:{" "}
+                {course.instructor?.name || course.instructor?.email}
               </p>
-              <button className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-all duration-300">
+              <p className="text-gray-400 mb-4">Amount: ${course.amount}</p>
+              <Link
+                to={`/courses/${course._id}`}
+                className="bg-gray-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-all duration-300 inline-block"
+              >
                 View Details
-              </button>
+              </Link>
             </div>
           ))}
         </div>
