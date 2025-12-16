@@ -4,6 +4,8 @@ import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Courses from "./pages/Courses";
 import Profile from "./components/Profile"; // 👈 make sure this file exists
+import TeacherDashboard from "./pages/TeacherDashboard";
+import TeacherCreateCourse from "./pages/TeacherCreateCourse";
 
 function App() {
   return (
@@ -36,6 +38,23 @@ function App() {
           element={
             <ProtectedRoute>
               <Profile />
+            </ProtectedRoute>
+          }
+        />
+        {/* Teacher portal */}
+        <Route
+          path="/teacher"
+          element={
+            <ProtectedRoute role="teacher">
+              <TeacherDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher/create-course"
+          element={
+            <ProtectedRoute role="teacher">
+              <TeacherCreateCourse />
             </ProtectedRoute>
           }
         />

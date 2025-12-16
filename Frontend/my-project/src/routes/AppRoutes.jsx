@@ -12,6 +12,9 @@ function AppRoutes() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/courses" element={<Courses />} />
         <Route path="/auth" element={<Auth />} /> {/* ✅ */}
+        <Route path="/courses" element={<Courses />} />
+        <Route path="/courses/:id" element={<CourseDetails />} />
+        <Route path="/teacher" element={<TeacherDashboard />} />
       </Routes>
     </Router>
   );
