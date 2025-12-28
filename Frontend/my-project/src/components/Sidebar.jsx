@@ -16,9 +16,23 @@ export default function Sidebar() {
     { path: "/profile", label: "Profile", icon: "👤" },
   ];
 
-  // Teacher-only items (removed Teacher Portal, kept Create Course)
+  // Teacher-only items
   const teacherItems = [
     { path: "/teacher/create-course", label: "Create Course", icon: "➕" },
+  ];
+
+  // Admin-only items
+  const adminItems = [
+    { path: "/admin", label: "Admin Dashboard", icon: "🛠️" },
+    { path: "/admin/create-teacher", label: "Create Teacher", icon: "👨‍🏫" },
+    { path: "/admin/create-student", label: "Create Student", icon: "🎓" },
+    {
+      path: "/admin/pending-approvals",
+      label: "Pending Approvals",
+      icon: "⏳",
+    },
+    { path: "/admin/manage-teachers", label: "Manage Teachers", icon: "🗂️" },
+    { path: "/admin/manage-students", label: "Manage Students", icon: "📋" },
   ];
 
   return (
@@ -26,6 +40,7 @@ export default function Sidebar() {
       <h2 className="text-2xl font-bold mb-6">LMS</h2>
       <nav className="flex-1">
         <ul className="space-y-2">
+          {/* Common nav items */}
           {navItems.map((item) => (
             <li key={item.path}>
               <NavLink
@@ -42,9 +57,28 @@ export default function Sidebar() {
             </li>
           ))}
 
-          {/* Render teacher-only links if role is teacher */}
+          {/* Teacher-only links (only if approved) */}
           {user.role === "teacher" &&
+            user.status === "approved" &&
             teacherItems.map((item) => (
+              <li key={item.path}>
+                <NavLink
+                  to={item.path}
+                  className={({ isActive }) =>
+                    `flex items-center p-2 rounded-md hover:bg-gray-700 ${
+                      isActive ? "bg-blue-600 text-white" : ""
+                    }`
+                  }
+                >
+                  <span className="mr-2">{item.icon}</span>
+                  {item.label}
+                </NavLink>
+              </li>
+            ))}
+
+          {/* Admin-only links */}
+          {user.role === "admin" &&
+            adminItems.map((item) => (
               <li key={item.path}>
                 <NavLink
                   to={item.path}

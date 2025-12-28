@@ -2,34 +2,41 @@ import express from "express";
 import Course from "../models/Course.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
 import upload from "../middlewares/upload.middleware.js";
+import checkTeacherApproved from "../middlewares/teacherStatus.middleware.js";
 
 const router = express.Router();
 
-// Create course (teacher only)
-router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
-  try {
-    if (req.user.role !== "teacher") {
-      return res
-        .status(403)
-        .json({ message: "Only teachers can create courses" });
+// Create course (teacher only, must be approved)
+router.post(
+  "/",
+  authMiddleware,
+  checkTeacherApproved, // ✅ block unapproved teachers
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      if (req.user.role !== "teacher") {
+        return res
+          .status(403)
+          .json({ message: "Only teachers can create courses" });
+      }
+
+      const { title, description, amount } = req.body;
+
+      const course = new Course({
+        title,
+        description,
+        amount: Number(amount),
+        instructor: req.user.id,
+        image: req.file ? req.file.filename : null,
+      });
+
+      await course.save();
+      res.status(201).json(course);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
     }
-
-    const { title, description, amount } = req.body;
-
-    const course = new Course({
-      title,
-      description,
-      amount: Number(amount),
-      instructor: req.user.id,
-      image: req.file ? req.file.filename : null,
-    });
-
-    await course.save();
-    res.status(201).json(course);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
   }
-});
+);
 
 // Get all courses
 router.get("/", async (req, res) => {

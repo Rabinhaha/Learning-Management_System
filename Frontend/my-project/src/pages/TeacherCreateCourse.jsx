@@ -3,6 +3,24 @@ import { createCourse } from "../utils/api";
 import Sidebar from "../components/Sidebar";
 
 export default function TeacherCreateCourse() {
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+  // 🚫 Block unapproved teachers
+  if (user.role === "teacher" && user.status !== "approved") {
+    return (
+      <div className="flex min-h-screen bg-gray-900">
+        <Sidebar />
+        <div className="flex-1 p-8 ml-64 text-white">
+          <h1 className="text-2xl font-bold">Access Denied</h1>
+          <p>
+            Your profile is not approved yet. Please wait for admin approval.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // ✅ Approved teachers can create courses
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
@@ -18,7 +36,7 @@ export default function TeacherCreateCourse() {
       formData.append("amount", amount);
       if (image) formData.append("image", image);
 
-      const course = await createCourse(formData); // 👈 send FormData
+      const course = await createCourse(formData);
       setMessage(`Course "${course.title}" created successfully!`);
       setTitle("");
       setDescription("");

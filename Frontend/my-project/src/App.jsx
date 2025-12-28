@@ -3,9 +3,17 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Courses from "./pages/Courses";
-import Profile from "./components/Profile"; // 👈 make sure this file exists
+import Profile from "./components/Profile";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import TeacherCreateCourse from "./pages/TeacherCreateCourse";
+import AdminDashboard from "./pages/AdminDashboard";
+
+// new admin pages
+import AdminCreateTeacher from "./pages/AdminCreateTeacher";
+import AdminCreateStudent from "./pages/AdminCreateStudent";
+import AdminPendingApprovals from "./pages/AdminPendingApprovals";
+import AdminManageTeachers from "./pages/AdminManageTeachers";
+import AdminManageStudents from "./pages/AdminManageStudents";
 
 function App() {
   return (
@@ -23,7 +31,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/courses"
           element={
@@ -32,7 +39,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/profile"
           element={
@@ -41,6 +47,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         {/* Teacher portal */}
         <Route
           path="/teacher"
@@ -55,6 +62,56 @@ function App() {
           element={
             <ProtectedRoute role="teacher">
               <TeacherCreateCourse />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin portal */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/create-teacher"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminCreateTeacher />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/create-student"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminCreateStudent />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/pending-approvals"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminPendingApprovals />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/manage-teachers"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminManageTeachers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/manage-students"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminManageStudents />
             </ProtectedRoute>
           }
         />
