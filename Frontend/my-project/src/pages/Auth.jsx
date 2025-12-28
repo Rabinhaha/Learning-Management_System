@@ -4,6 +4,7 @@ import { login } from "../utils/api";
 
 export default function Auth() {
   const [form, setForm] = useState({ email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false); // 👈 new state
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -14,21 +15,17 @@ export default function Auth() {
     e.preventDefault();
     try {
       const data = await login(form);
-      console.log("Auth response:", data);
-      console.log("Token in localStorage:", localStorage.getItem("token"));
-      console.log("User in localStorage:", localStorage.getItem("user"));
       alert("Login successful!");
 
-      // Navigate based on role
       const user = data.user;
       if (user?.role === "teacher") {
         navigate("/teacher");
       } else if (user?.role === "student") {
-        navigate("/dashboard"); // student portal
+        navigate("/dashboard");
       } else if (user?.role === "admin") {
-        navigate("/admin"); // future admin portal
+        navigate("/admin");
       } else {
-        navigate("/"); // fallback
+        navigate("/");
       }
     } catch (err) {
       console.error("Auth error:", err.message);
@@ -50,15 +47,26 @@ export default function Auth() {
             className="w-full p-2 border rounded text-white"
             required
           />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={form.password}
-            onChange={handleChange}
-            className="w-full p-2 border rounded text-white"
-            required
-          />
+
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"} // 👈 toggle type
+              name="password"
+              placeholder="Password"
+              value={form.password}
+              onChange={handleChange}
+              className="w-full p-2 border rounded text-white pr-16"
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)} // 👈 toggle state
+              className="absolute right-2 top-2 text-sm bg-gray-700 px-2 py-1 rounded"
+            >
+              {showPassword ? "Hide" : "View"}
+            </button>
+          </div>
+
           <button
             type="submit"
             className="w-full py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
