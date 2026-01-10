@@ -98,14 +98,12 @@ export const createCourse = async (courseData) =>
 export const getInstructorCourses = async () =>
   request("api/courses/instructor", { method: "GET" });
 
-// Teacher profile submission (for approval workflow)
 export const submitTeacherProfile = async (formData) =>
   request("api/user/teacher/profile", {
     method: "POST",
     body: formData, // ✅ raw FormData
   });
 
-// Generic user profile update (students/admin)
 export const updateUserProfile = async (formData) =>
   request("api/user/profile", {
     method: "PUT",
@@ -117,31 +115,61 @@ export const updateUserProfile = async (formData) =>
 // =======================
 export const getUsers = async () =>
   request("api/admin/users", { method: "GET" });
+
 export const getAdminCourses = async () =>
   request("api/admin/courses", { method: "GET" });
+
 export const createUser = async (userData) =>
   request("api/admin/users", {
     method: "POST",
     body: JSON.stringify(userData),
   });
+
 export const updateUser = async (id, updates) =>
   request(`api/admin/users/${id}`, {
     method: "PUT",
     body: JSON.stringify(updates),
   });
+
 export const deleteUser = async (id) =>
   request(`api/admin/users/${id}`, { method: "DELETE" });
+
 export const updateCourse = async (id, updates) =>
   request(`api/admin/courses/${id}`, {
     method: "PUT",
     body: JSON.stringify(updates),
   });
+
 export const deleteCourse = async (id) =>
   request(`api/admin/courses/${id}`, { method: "DELETE" });
+
+// =======================
+// Teacher Management (Admin)
+// =======================
+
+// Get all teachers
+export const getTeachers = async () =>
+  request("api/admin/teachers", { method: "GET" });
+
+// Create a new teacher
+export const createTeacher = async (teacherData) =>
+  request("api/admin/teachers", {
+    method: "POST",
+    body: JSON.stringify(teacherData),
+  });
 
 // Approve or update teacher status
 export const updateTeacherStatus = async (id, status) =>
   request(`api/admin/teachers/${id}/status`, {
+    method: "PATCH",
+    body: JSON.stringify({ status }),
+  });
+
+export const getStudents = async () =>
+  request("api/admin/students", { method: "GET" });
+
+export const updateStudentStatus = async (id, status) =>
+  request(`api/admin/students/${id}/status`, {
     method: "PATCH",
     body: JSON.stringify({ status }),
   });

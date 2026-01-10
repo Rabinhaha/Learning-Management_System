@@ -3,36 +3,17 @@ import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-    },
-    password: {
-      type: String,
-      required: true,
-      minlength: 8,
-    },
+    name: { type: String, required: true, trim: true },
+    email: { type: String, required: true, unique: true, lowercase: true },
+    password: { type: String, required: true, minlength: 8 },
     role: {
       type: String,
-      enum: ["student", "teacher", "admin"], // aligned with FE
+      enum: ["student", "teacher", "admin"],
       required: true,
     },
 
-    // 🔑 Teacher-specific fields
-    masterCourse: {
-      type: String,
-      trim: true,
-    },
-    idCardImage: {
-      type: String, // store file path or URL
-    },
+    // Teacher-specific fields
+    masterCourse: { type: String, trim: true },
     status: {
       type: String,
       enum: ["pending", "approved", "in-progress", "denied"],
