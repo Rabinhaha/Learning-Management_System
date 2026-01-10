@@ -11,9 +11,9 @@ import AdminDashboard from "./pages/AdminDashboard";
 // new admin pages
 import AdminCreateTeacher from "./pages/AdminCreateTeacher";
 import AdminCreateStudent from "./pages/AdminCreateStudent";
-import AdminPendingApprovals from "./pages/AdminPendingApprovals";
-import AdminManageTeachers from "./pages/AdminManageTeachers";
-import AdminManageStudents from "./pages/AdminManageStudents";
+
+import Register from "./pages/RegisterTeacher";
+import RegisterStudent from "./pages/RegisterStudent"; // ✅ add this import
 
 function App() {
   return (
@@ -91,30 +91,10 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/admin/pending-approvals"
-          element={
-            <ProtectedRoute role="admin">
-              <AdminPendingApprovals />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/manage-teachers"
-          element={
-            <ProtectedRoute role="admin">
-              <AdminManageTeachers />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/manage-students"
-          element={
-            <ProtectedRoute role="admin">
-              <AdminManageStudents />
-            </ProtectedRoute>
-          }
-        />
+
+        {/* Registration pages */}
+        <Route path="/register" element={<Register />} />
+        <Route path="/register-student" element={<RegisterStudent />} />
       </Routes>
     </BrowserRouter>
   );

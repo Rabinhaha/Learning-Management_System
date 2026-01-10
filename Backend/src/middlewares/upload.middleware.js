@@ -1,17 +1,23 @@
+// src/middlewares/upload.middleware.js
 import multer from "multer";
 import path from "path";
+import fs from "fs";
 
-const uploadPath = path.join(process.cwd(), "Backend/uploads");
-console.log("Uploads folder served from:", uploadPath);
+const uploadDir = path.join(process.cwd(), "uploads");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadPath);
+  destination: function (req, file, cb) {
+    cb(null, uploadDir);
   },
-  filename: (req, file, cb) => {
+  filename: function (req, file, cb) {
     cb(null, Date.now() + "-" + file.originalname);
   },
 });
 
 const upload = multer({ storage });
+
+// ✅ export as default
 export default upload;

@@ -1,86 +1,92 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { logoutUser, getAuthToken } from "../utils/api";
-import Sidebar from "../components/Sidebar.jsx";
+import { Pie } from "react-chartjs-2";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import Sidebar from "../components/Sidebar.jsx"; // ✅ import your reusable sidebar
 
-function Dashboard() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [user, setUser] = useState(null);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
+ChartJS.register(ArcElement, Tooltip, Legend);
 
-  useEffect(() => {
-    console.log("Current route:", location.pathname); // Debug
-    const token = getAuthToken();
-    console.log("Dashboard token:", token); // Debug
-    if (!token) {
-      setError("No authentication token found");
-      setLoading(false);
-      navigate("/"); // Redirect to login
-      return;
-    }
-
-    const storedUser = localStorage.getItem("user");
-    console.log("Dashboard user:", storedUser); // Debug
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-      setLoading(false);
-    } else {
-      setError("No user data found");
-      logoutUser();
-      setLoading(false);
-      navigate("/");
-    }
-  }, [navigate, location.pathname]);
-
-  if (loading)
-    return (
-      <div className="text-center text-white bg-gray-900 min-h-screen flex items-center justify-center">
-        Loading...
-      </div>
-    );
-  if (error)
-    return (
-      <div className="text-red-500 text-center bg-gray-900 min-h-screen flex items-center justify-center">
-        {error}
-      </div>
-    );
+export default function Dashboard() {
+  // Dummy data — replace with API later
+  const stats = {
+    teachers: 42,
+    students: 320,
+    courses: 18,
+    revenue: "NPR 1,200,000",
+    teacherGender: { male: 30, female: 12 },
+    studentGender: { male: 200, female: 120 },
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-900">
+      {/* Sidebar */}
       <Sidebar />
-      <div className="flex-1 p-8 ml-64 text-white">
-        <h1 className="text-4xl font-bold mb-4 text-left">About Us</h1>
-        <div className="text-lg text-left space-y-4">
-          <p>
-            Welcome to our Learning Management System (LMS), a platform designed
-            to empower students, instructors, and administrators with seamless
-            access to educational resources. Our mission is to foster a dynamic
-            learning environment that supports growth and innovation.
-          </p>
-          <p>
-            Our LMS offers a wide range of features, including course
-            management, user profiles, and interactive tools to enhance the
-            learning experience. Whether you're a student exploring new subjects
-            or an instructor creating engaging content, our platform is tailored
-            to meet your needs.
-          </p>
-          <p>
-            Built with cutting-edge technology, our system ensures reliability,
-            security, and ease of use. We are committed to continuously
-            improving our platform to provide the best possible experience for
-            all users.
-          </p>
-          <p>
-            {user
-              ? `Logged in as ${user.email} (${user.role})`
-              : "You have successfully logged in."}
-          </p>
+
+      {/* Main content */}
+      <div className="flex-1 ml-64 p-8 bg-white text-black">
+        <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
+
+        {/* Top stats */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
+          <StatCard label="Total Teachers" value={stats.teachers} />
+          <StatCard label="Total Students" value={stats.students} />
+          <StatCard label="Total Courses" value={stats.courses} />
+          <StatCard label="Total Revenue" value={stats.revenue} />
+        </div>
+
+        {/* Gender charts */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <GenderPieChart
+            title="Teacher Gender"
+            male={stats.teacherGender.male}
+            female={stats.teacherGender.female}
+          />
+          <GenderPieChart
+            title="Student Gender"
+            male={stats.studentGender.male}
+            female={stats.studentGender.female}
+          />
         </div>
       </div>
     </div>
   );
 }
 
-export default Dashboard;
+function StatCard({ label, value }) {
+  return (
+    <div className="bg-white rounded shadow p-6 text-center border">
+      <h2 className="text-lg font-semibold text-gray-600">{label}</h2>
+      <p className="text-3xl font-bold text-blue-600 mt-2">{value}</p>
+    </div>
+  );
+}
+
+function GenderPieChart({ title, male, female }) {
+  const data = {
+    labels: ["Male", "Female"],
+    datasets: [
+      {
+        data: [male, female],
+        backgroundColor: ["#3b82f6", "#ec4899"], // blue & pink
+        hoverBackgroundColor: ["#2563eb", "#db2777"],
+      },
+    ],
+  };
+
+  const options = {
+    plugins: {
+      legend: {
+        position: "bottom",
+        labels: {
+          color: "#374151",
+          font: { size: 14 },
+        },
+      },
+    },
+  };
+
+  return (
+    <div className="bg-white rounded shadow p-6 border">
+      <h2 className="text-lg font-semibold text-gray-600 mb-4">{title}</h2>
+      <Pie data={data} options={options} />
+    </div>
+  );
+}

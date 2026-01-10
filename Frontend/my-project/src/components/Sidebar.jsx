@@ -1,12 +1,14 @@
+// Sidebar.jsx
 import { NavLink, useNavigate } from "react-router-dom";
 import { logoutUser } from "../utils/api";
 
 export default function Sidebar() {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const user = JSON.parse(localStorage.getItem("user")) || { role: "guest" };
 
   const handleLogout = () => {
     logoutUser();
+    localStorage.removeItem("user"); // clear user
     navigate("/");
   };
 
@@ -16,31 +18,21 @@ export default function Sidebar() {
     { path: "/profile", label: "Profile", icon: "👤" },
   ];
 
-  // Teacher-only items
   const teacherItems = [
     { path: "/teacher/create-course", label: "Create Course", icon: "➕" },
   ];
 
-  // Admin-only items
+  // ✅ Only keep the admin links you want
   const adminItems = [
-    { path: "/admin", label: "Admin Dashboard", icon: "🛠️" },
     { path: "/admin/create-teacher", label: "Create Teacher", icon: "👨‍🏫" },
     { path: "/admin/create-student", label: "Create Student", icon: "🎓" },
-    {
-      path: "/admin/pending-approvals",
-      label: "Pending Approvals",
-      icon: "⏳",
-    },
-    { path: "/admin/manage-teachers", label: "Manage Teachers", icon: "🗂️" },
-    { path: "/admin/manage-students", label: "Manage Students", icon: "📋" },
   ];
 
   return (
-    <aside className="fixed top-0 left-0 h-screen w-64 bg-gray-800 text-white flex flex-col p-4 z-10">
+    <aside className="fixed top-0 left-0 h-screen w-64 bg-black text-white flex flex-col p-4 z-10">
       <h2 className="text-2xl font-bold mb-6">LMS</h2>
       <nav className="flex-1">
         <ul className="space-y-2">
-          {/* Common nav items */}
           {navItems.map((item) => (
             <li key={item.path}>
               <NavLink
@@ -57,9 +49,7 @@ export default function Sidebar() {
             </li>
           ))}
 
-          {/* Teacher-only links (only if approved) */}
           {user.role === "teacher" &&
-            user.status === "approved" &&
             teacherItems.map((item) => (
               <li key={item.path}>
                 <NavLink
@@ -76,7 +66,6 @@ export default function Sidebar() {
               </li>
             ))}
 
-          {/* Admin-only links */}
           {user.role === "admin" &&
             adminItems.map((item) => (
               <li key={item.path}>
