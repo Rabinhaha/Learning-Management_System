@@ -7,13 +7,15 @@ import Profile from "./components/Profile";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import TeacherCreateCourse from "./pages/TeacherCreateCourse";
 import AdminDashboard from "./pages/AdminDashboard";
+import CourseDetail from "./pages/CourseDetail.jsx"; // ✅ singular, consistent
+import BuyCourse from "./pages/BuyCourse.jsx";
 
 // new admin pages
 import AdminCreateTeacher from "./pages/AdminCreateTeacher";
 import AdminCreateStudent from "./pages/AdminCreateStudent";
 
 import Register from "./pages/RegisterTeacher";
-import RegisterStudent from "./pages/RegisterStudent"; // ✅ add this import
+import RegisterStudent from "./pages/RegisterStudent";
 
 function App() {
   return (
@@ -95,6 +97,10 @@ function App() {
         {/* Registration pages */}
         <Route path="/register" element={<Register />} />
         <Route path="/register-student" element={<RegisterStudent />} />
+
+        {/* Course detail */}
+        <Route path="/courses/:id" element={<CourseDetail />} />
+        <Route path="/courses/:id/buy" element={<BuyCourse />} />
       </Routes>
     </BrowserRouter>
   );

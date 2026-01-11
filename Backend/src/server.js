@@ -11,6 +11,7 @@ import authRoutes from "./routes/auth.routes.js";
 import courseRoutes from "./routes/course.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import userRoutes from "./routes/user.routes.js";
+import statsRoutes from "./routes/stats.routes.js";
 
 // ✅ Swagger imports
 import swaggerUi from "swagger-ui-express";
@@ -25,11 +26,7 @@ const PORT = process.env.PORT || 5000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-
-// ✅ Ensure uploads directory exists
+// ✅ Ensure uploads directory exists (Backend/uploads)
 const uploadDir = path.join(__dirname, "../uploads");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
@@ -37,6 +34,10 @@ if (!fs.existsSync(uploadDir)) {
 
 // Serve uploaded images statically
 app.use("/uploads", express.static(uploadDir));
+
+// Middleware
+app.use(cors());
+app.use(express.json());
 
 // ✅ Swagger configuration
 const options = {
@@ -65,7 +66,8 @@ app.use("/swagger/api", swaggerUi.serve, swaggerUi.setup(specs));
 app.use("/api/auth", authRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/api/user", userRoutes); // ✅ mount user routes here
+app.use("/api/user", userRoutes);
+app.use("/api/stats", statsRoutes);
 
 // MongoDB connection + start server
 mongoose

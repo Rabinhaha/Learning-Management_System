@@ -1,18 +1,20 @@
 import { useState } from "react";
-import { createCourse } from "../utils/api";
-import Sidebar from "../components/Sidebar";
+import { useNavigate } from "react-router-dom";
+import { createCourse } from "../utils/api.jsx";
+import Sidebar from "../components/Sidebar.jsx";
 
 export default function TeacherCreateCourse() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const navigate = useNavigate();
 
   // 🚫 Block unapproved teachers
   if (user.role === "teacher" && user.status !== "approved") {
     return (
       <div className="flex min-h-screen bg-gray-900">
         <Sidebar />
-        <div className="flex-1 p-8 ml-64 text-white">
-          <h1 className="text-2xl font-bold">Access Denied</h1>
-          <p>
+        <div className="flex-1 p-8 ml-64 text-white flex flex-col items-center justify-center">
+          <h1 className="text-3xl font-bold mb-4">Access Denied</h1>
+          <p className="text-gray-400">
             Your profile is not approved yet. Please wait for admin approval.
           </p>
         </div>
@@ -20,7 +22,6 @@ export default function TeacherCreateCourse() {
     );
   }
 
-  // ✅ Approved teachers can create courses
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
@@ -37,13 +38,10 @@ export default function TeacherCreateCourse() {
       if (image) formData.append("image", image);
 
       const course = await createCourse(formData);
-      setMessage(`Course "${course.title}" created successfully!`);
-      setTitle("");
-      setDescription("");
-      setAmount("");
-      setImage(null);
+      setMessage(`✅ Course "${course.title}" created successfully!`);
+      navigate(`/courses/${course._id}`);
     } catch (err) {
-      setMessage("Error: " + err.message);
+      setMessage("❌ Error: " + err.message);
     }
   };
 
@@ -51,45 +49,84 @@ export default function TeacherCreateCourse() {
     <div className="flex min-h-screen bg-gray-900">
       <Sidebar />
       <div className="flex-1 p-8 ml-64 text-white">
-        <h1 className="text-3xl font-bold mb-6">Create Course</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="text"
-            placeholder="Course Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full p-2 rounded bg-gray-800 text-white"
-            required
-          />
-          <textarea
-            placeholder="Course Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="w-full p-2 rounded bg-gray-800 text-white"
-            required
-          />
-          <input
-            type="number"
-            placeholder="Course Amount"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="w-full p-2 rounded bg-gray-800 text-white"
-            required
-          />
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setImage(e.target.files[0])}
-            className="w-full p-2 rounded bg-gray-800 text-white"
-          />
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-4xl font-bold">Create Course</h1>
           <button
-            type="submit"
-            className="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded"
+            onClick={() => navigate("/courses")}
+            className="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg text-white font-semibold shadow-md"
           >
-            Create Course
+            ← Back to Courses
           </button>
-        </form>
-        {message && <p className="mt-4">{message}</p>}
+        </div>
+
+        <div className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-2xl">
+          {message && (
+            <div
+              className={`mb-4 p-3 rounded ${
+                message.startsWith("✅")
+                  ? "bg-green-700 text-green-200"
+                  : "bg-red-700 text-red-200"
+              }`}
+            >
+              {message}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="block mb-2 font-semibold">Course Title</label>
+              <input
+                type="text"
+                placeholder="Enter course title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full p-3 rounded bg-gray-700 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block mb-2 font-semibold">Description</label>
+              <textarea
+                placeholder="Enter course description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full p-3 rounded bg-gray-700 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                rows="4"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block mb-2 font-semibold">Amount ($)</label>
+              <input
+                type="number"
+                placeholder="Enter course fee"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="w-full p-3 rounded bg-gray-700 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block mb-2 font-semibold">Course Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setImage(e.target.files[0])}
+                className="w-full p-3 rounded bg-gray-700 text-white cursor-pointer"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-500 active:bg-blue-700 px-4 py-3 rounded-lg font-bold shadow-md transition-all"
+            >
+              Create Course
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

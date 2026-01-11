@@ -86,11 +86,14 @@ export const getProfile = async () => request("api/auth/me");
 // =======================
 // Course APIs
 // =======================
+
 export const getCourses = async () => request("api/courses", { method: "GET" });
+
 export const getCourseById = async (id) =>
   request(`api/courses/${id}`, { method: "GET" });
-export const createCourse = async (courseData) =>
-  request("api/courses", { method: "POST", body: courseData });
+
+export const createCourse = async (formData) =>
+  request("api/courses", { method: "POST", body: formData });
 
 // =======================
 // Teacher APIs

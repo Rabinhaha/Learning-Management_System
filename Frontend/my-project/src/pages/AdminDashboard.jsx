@@ -1,103 +1,50 @@
-import { NavLink, useNavigate } from "react-router-dom";
-import { logoutUser } from "../utils/api";
+import { useEffect, useState } from "react";
+import Sidebar from "../components/Sidebar.jsx";
 
-export default function Sidebar() {
-  const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+export default function AdminDashboard() {
+  const [stats, setStats] = useState(null);
 
-  const handleLogout = () => {
-    logoutUser();
-    navigate("/");
-  };
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/stats", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        const data = await res.json();
+        setStats(data);
+      } catch (err) {
+        console.error("Error fetching stats:", err);
+      }
+    };
+    fetchStats();
+  }, []);
 
-  const navItems = [
-    { path: "/dashboard", label: "Dashboard", icon: "🏠" },
-    { path: "/courses", label: "Courses", icon: "📚" },
-    { path: "/profile", label: "Profile", icon: "👤" },
-  ];
-
-  // Teacher-only items
-  const teacherItems = [
-    { path: "/teacher/create-course", label: "Create Course", icon: "➕" },
-  ];
-
-  // Admin-only items
-  const adminItems = [
-    { path: "/admin/create-teacher", label: "Create Teacher", icon: "👨‍🏫" },
-    { path: "/admin/create-student", label: "Create Student", icon: "🎓" },
-    {
-      path: "/admin/pending-approvals",
-      label: "Pending Approvals",
-      icon: "⏳",
-    },
-    { path: "/admin/manage-teachers", label: "Manage Teachers", icon: "🗂️" },
-    { path: "/admin/manage-students", label: "Manage Students", icon: "📋" },
-  ];
+  if (!stats) return <p className="text-white">Loading stats...</p>;
 
   return (
-    <aside className="fixed top-0 left-0 h-screen w-64 bg-gray-800 text-white flex flex-col p-4 z-10">
-      <h2 className="text-2xl font-bold mb-6">LMS</h2>
-      <nav className="flex-1">
-        <ul className="space-y-2">
-          {navItems.map((item) => (
-            <li key={item.path}>
-              <NavLink
-                to={item.path}
-                className={({ isActive }) =>
-                  `flex items-center p-2 rounded-md hover:bg-gray-700 ${
-                    isActive ? "bg-blue-600 text-white" : ""
-                  }`
-                }
-              >
-                <span className="mr-2">{item.icon}</span>
-                {item.label}
-              </NavLink>
-            </li>
-          ))}
+    <div className="flex min-h-screen bg-gray-900">
+      <Sidebar />
+      <div className="flex-1 p-8 ml-64 text-white">
+        <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
 
-          {/* Teacher-only links */}
-          {user.role === "teacher" &&
-            teacherItems.map((item) => (
-              <li key={item.path}>
-                <NavLink
-                  to={item.path}
-                  className={({ isActive }) =>
-                    `flex items-center p-2 rounded-md hover:bg-gray-700 ${
-                      isActive ? "bg-blue-600 text-white" : ""
-                    }`
-                  }
-                >
-                  <span className="mr-2">{item.icon}</span>
-                  {item.label}
-                </NavLink>
-              </li>
-            ))}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+          <StatCard label="Teachers" value={stats.teachers} />
+          <StatCard label="Students" value={stats.students} />
+          <StatCard label="Courses" value={stats.courses} />
+          <StatCard label="Revenue" value={`NPR ${stats.revenue}`} />
+        </div>
+      </div>
+    </div>
+  );
+}
 
-          {/* Admin-only links */}
-          {user.role === "admin" &&
-            adminItems.map((item) => (
-              <li key={item.path}>
-                <NavLink
-                  to={item.path}
-                  className={({ isActive }) =>
-                    `flex items-center p-2 rounded-md hover:bg-gray-700 ${
-                      isActive ? "bg-blue-600 text-white" : ""
-                    }`
-                  }
-                >
-                  <span className="mr-2">{item.icon}</span>
-                  {item.label}
-                </NavLink>
-              </li>
-            ))}
-        </ul>
-      </nav>
-      <button
-        onClick={handleLogout}
-        className="mt-auto p-2 bg-red-500 hover:bg-red-600 rounded-md text-white font-semibold"
-      >
-        Logout
-      </button>
-    </aside>
+function StatCard({ label, value }) {
+  return (
+    <div className="bg-gray-800 p-6 rounded-lg shadow-md text-center">
+      <p className="text-sm text-gray-400 mb-2">{label}</p>
+      <p className="text-2xl font-bold">{value}</p>
+    </div>
   );
 }

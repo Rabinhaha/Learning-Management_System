@@ -16,6 +16,11 @@ export default function Auth() {
     e.preventDefault();
     try {
       const data = await login(form);
+
+      // ✅ Save token + user in localStorage
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
       alert("Login successful!");
 
       const user = data.user;
@@ -46,7 +51,7 @@ export default function Auth() {
             placeholder="Email"
             value={form.email}
             onChange={handleChange}
-            className="w-full p-2 border rounded text-white"
+            className="w-full p-2 border rounded bg-gray-800 text-white"
             required
           />
 
@@ -58,10 +63,9 @@ export default function Auth() {
               placeholder="Password"
               value={form.password}
               onChange={handleChange}
-              className="w-full p-2 border rounded text-white pr-10"
+              className="w-full p-2 border rounded bg-gray-800 text-white pr-10"
               required
             />
-
             <span
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-blue-400"
@@ -73,7 +77,7 @@ export default function Auth() {
           {/* Submit button */}
           <button
             type="submit"
-            className="w-full py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="w-full py-2 bg-blue-500 text-white rounded hover:bg-blue-600 font-semibold"
           >
             Login
           </button>
