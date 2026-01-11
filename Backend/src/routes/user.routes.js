@@ -26,7 +26,7 @@ router.post(
         updates.idCardImage = req.file.filename;
       }
 
-      const updated = await User.findByIdAndUpdate(req.user._id, updates, {
+      const updated = await User.findByIdAndUpdate(req.user.id, updates, {
         new: true,
       });
 

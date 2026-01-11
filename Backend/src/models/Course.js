@@ -2,17 +2,24 @@ import mongoose from "mongoose";
 
 const courseSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true },
+    title: { type: String, required: true, trim: true },
     description: { type: String, required: true },
-    amount: { type: Number, required: true },
+    amount: { type: Number, required: true, min: 1 },
     instructor: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
-    image: { type: String }, // filename of uploaded image
+    imageUrl: { type: String }, // ✅ Cloudinary secure URL
+    imagePublicId: { type: String }, // ✅ Cloudinary public_id
   },
   { timestamps: true }
 );
+
+// Virtual field for formatted price
+courseSchema.virtual("formattedAmount").get(function () {
+  return `NPR ${this.amount}`;
+});
 
 export default mongoose.model("Course", courseSchema);

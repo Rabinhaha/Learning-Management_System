@@ -1,4 +1,3 @@
-// Sidebar.jsx
 import { NavLink, useNavigate } from "react-router-dom";
 import { logoutUser } from "../utils/api";
 
@@ -16,10 +15,6 @@ export default function Sidebar() {
     { path: "/dashboard", label: "Dashboard", icon: "🏠" },
     { path: "/courses", label: "Courses", icon: "📚" },
     { path: "/profile", label: "Profile", icon: "👤" },
-  ];
-
-  const teacherItems = [
-    { path: "/teacher/create-course", label: "Create Course", icon: "➕" },
   ];
 
   // ✅ Only keep the admin links you want
@@ -48,23 +43,6 @@ export default function Sidebar() {
               </NavLink>
             </li>
           ))}
-
-          {user.role === "teacher" &&
-            teacherItems.map((item) => (
-              <li key={item.path}>
-                <NavLink
-                  to={item.path}
-                  className={({ isActive }) =>
-                    `flex items-center p-2 rounded-md hover:bg-gray-700 ${
-                      isActive ? "bg-blue-600 text-white" : ""
-                    }`
-                  }
-                >
-                  <span className="mr-2">{item.icon}</span>
-                  {item.label}
-                </NavLink>
-              </li>
-            ))}
 
           {user.role === "admin" &&
             adminItems.map((item) => (
