@@ -23,8 +23,16 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["pending", "approved", "in-progress", "denied"],
       default: "pending",
-      idCardImage: { type: String },
     },
+    idCardImage: { type: String },
+
+    // ✅ Add purchasedCourses field
+    purchasedCourses: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Course",
+      },
+    ],
   },
   { timestamps: true }
 );

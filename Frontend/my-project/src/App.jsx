@@ -7,8 +7,10 @@ import Profile from "./components/Profile";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import TeacherCreateCourse from "./pages/TeacherCreateCourse";
 import AdminDashboard from "./pages/AdminDashboard";
-import CourseDetail from "./pages/CourseDetail.jsx"; // ✅ singular, consistent
+import CourseDetail from "./pages/CourseDetail.jsx";
 import BuyCourse from "./pages/BuyCourse.jsx";
+import PurchasedCourses from "./pages/PurchasedCourses.jsx"; // ✅ correct file
+import MyPurchases from "./pages/MyPurchases.jsx"; // ✅ student purchases page
 
 // new admin pages
 import AdminCreateTeacher from "./pages/AdminCreateTeacher";
@@ -101,6 +103,17 @@ function App() {
         {/* Course detail */}
         <Route path="/courses/:id" element={<CourseDetail />} />
         <Route path="/courses/:id/buy" element={<BuyCourse />} />
+        <Route path="/courses/:id/purchasers" element={<PurchasedCourses />} />
+
+        {/* Student purchases */}
+        <Route
+          path="/purchased-courses"
+          element={
+            <ProtectedRoute role="student">
+              <MyPurchases />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

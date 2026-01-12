@@ -29,6 +29,7 @@ export default function TeacherListOnly() {
       setTeachers((prev) =>
         prev.map((t) => (t._id === id ? { ...t, status: "approved" } : t))
       );
+      // eslint-disable-next-line no-unused-vars
     } catch (err) {
       alert("Failed to approve teacher");
     }

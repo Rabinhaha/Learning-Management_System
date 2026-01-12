@@ -1,10 +1,33 @@
 import express from "express";
 import Course from "../models/Course.js";
-import User from "../models/User.js"; // ✅ import User model
+import User from "../models/User.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
-import upload from "../middlewares/upload.middleware.js"; // ✅ Cloudinary multer storage
+import upload from "../middlewares/upload.middleware.js";
 
 const router = express.Router();
+
+// ✅ Get all courses purchased by the logged-in student
+router.get("/my/purchases", authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== "student") {
+      return res
+        .status(403)
+        .json({ message: "Only students can view their purchases" });
+    }
+
+    const user = await User.findById(req.user.id).populate({
+      path: "purchasedCourses",
+      populate: { path: "instructor", select: "name email" },
+    });
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json(user.purchasedCourses);
+  } catch (err) {
+    console.error("Error in /my/purchases:", err);
+    res.status(500).json({ message: err.message });
+  }
+});
 
 // Create course (teacher only)
 router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
@@ -17,14 +40,13 @@ router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
 
     const { title, description, amount } = req.body;
 
-    // ✅ Cloudinary returns `req.file.path` (secure URL) and `req.file.filename` (public_id)
     const course = new Course({
       title,
       description,
       amount: Number(amount),
       instructor: req.user.id,
-      imageUrl: req.file ? req.file.path : null, // secure URL
-      imagePublicId: req.file ? req.file.filename : null, // public_id
+      imageUrl: req.file ? req.file.path : null,
+      imagePublicId: req.file ? req.file.filename : null,
     });
 
     await course.save();
@@ -35,7 +57,7 @@ router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
   }
 });
 
-// Get all courses (populate instructor)
+// Get all courses
 router.get("/", async (req, res) => {
   try {
     const courses = await Course.find().populate("instructor", "name email");
@@ -45,7 +67,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Get single course by ID (populate instructor)
+// Get single course by ID
 router.get("/:id", async (req, res) => {
   try {
     const course = await Course.findById(req.params.id).populate(
@@ -72,7 +94,10 @@ router.post("/:id/buy", authMiddleware, async (req, res) => {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // Add course to student's purchased list
+    if (!Array.isArray(user.purchasedCourses)) {
+      user.purchasedCourses = [];
+    }
+
     if (!user.purchasedCourses.includes(course._id)) {
       user.purchasedCourses.push(course._id);
       await user.save();
@@ -80,6 +105,24 @@ router.post("/:id/buy", authMiddleware, async (req, res) => {
 
     res.json({ message: "Course purchased successfully", course });
   } catch (err) {
+    console.error("Purchase error:", err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Get all students who purchased a specific course
+router.get("/:id/purchasers", authMiddleware, async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id);
+    if (!course) return res.status(404).json({ message: "Course not found" });
+
+    const purchasers = await User.find({ purchasedCourses: course._id }).select(
+      "name email role"
+    );
+
+    res.json({ course: course.title, purchasers });
+  } catch (err) {
+    console.error("Error fetching purchasers:", err);
     res.status(500).json({ message: err.message });
   }
 });
