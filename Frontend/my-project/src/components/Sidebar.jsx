@@ -11,29 +11,64 @@ export default function Sidebar() {
     navigate("/");
   };
 
+  // Base nav items for everyone
   const navItems = [
     { path: "/dashboard", label: "Dashboard", icon: "🏠" },
     { path: "/courses", label: "Courses", icon: "📚" },
     { path: "/profile", label: "Profile", icon: "👤" },
   ];
 
-  // ✅ Only keep the admin links you want
-  const adminItems = [
-    { path: "/admin/create-teacher", label: "Create Teacher", icon: "👨‍🏫" },
-    { path: "/admin/create-student", label: "Create Student", icon: "🎓" },
+  // Conditional items based on role
+  const studentItems =
+    user.role === "student"
+      ? [{ path: "/purchased-courses", label: "My Purchases", icon: "🛒" }]
+      : [];
+  const teacherItems =
+    user.role === "teacher"
+      ? [
+          { path: "/teacher", label: "Purchasers", icon: "📋" },
+          {
+            path: "/teacher/create-course",
+            label: "Create Course",
+            icon: "➕",
+          },
+        ]
+      : [];
+  const adminItems =
+    user.role === "admin"
+      ? [
+          { path: "/teacher", label: "Purchasers", icon: "📋" },
+          {
+            path: "/admin/create-teacher",
+            label: "Create Teacher",
+            icon: "👨‍🏫",
+          },
+          {
+            path: "/admin/create-student",
+            label: "Create Student",
+            icon: "🎓",
+          },
+        ]
+      : [];
+
+  const allItems = [
+    ...navItems,
+    ...studentItems,
+    ...teacherItems,
+    ...adminItems,
   ];
 
   return (
     <aside className="fixed top-0 left-0 h-screen w-64 bg-black text-white flex flex-col p-4 z-10">
-      <h2 className="text-2xl font-bold mb-6">LMS</h2>
+      <h2 className="text-2xl font-bold mb-6">LMS Dashboard</h2>
       <nav className="flex-1">
         <ul className="space-y-2">
-          {navItems.map((item) => (
+          {allItems.map((item) => (
             <li key={item.path}>
               <NavLink
                 to={item.path}
                 className={({ isActive }) =>
-                  `flex items-center p-2 rounded-md hover:bg-gray-700 ${
+                  `flex items-center p-2 rounded-md hover:bg-gray-700 transition-colors ${
                     isActive ? "bg-blue-600 text-white" : ""
                   }`
                 }
@@ -43,23 +78,6 @@ export default function Sidebar() {
               </NavLink>
             </li>
           ))}
-
-          {user.role === "admin" &&
-            adminItems.map((item) => (
-              <li key={item.path}>
-                <NavLink
-                  to={item.path}
-                  className={({ isActive }) =>
-                    `flex items-center p-2 rounded-md hover:bg-gray-700 ${
-                      isActive ? "bg-blue-600 text-white" : ""
-                    }`
-                  }
-                >
-                  <span className="mr-2">{item.icon}</span>
-                  {item.label}
-                </NavLink>
-              </li>
-            ))}
         </ul>
       </nav>
       <button
