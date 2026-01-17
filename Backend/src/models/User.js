@@ -18,6 +18,8 @@ const userSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+
+    // Teacher-specific fields
     masterCourse: { type: String, trim: true },
     status: {
       type: String,
@@ -26,18 +28,19 @@ const userSchema = new mongoose.Schema(
     },
     idCardImage: { type: String },
 
-    // ✅ Add purchasedCourses field
+    // ✅ Track courses purchased by this student
     purchasedCourses: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Course",
+        default: [], // ensure empty array by default
       },
     ],
   },
   { timestamps: true }
 );
 
-// Hash password before saving
+// 🔒 Hash password before saving
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   try {
@@ -49,12 +52,12 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-// Compare password method
+// 🔑 Compare password method
 userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// Approve teacher helper
+// 👨‍🏫 Approve teacher helper
 userSchema.methods.approveTeacher = async function () {
   this.status = "approved";
   return this.save();

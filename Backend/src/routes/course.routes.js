@@ -29,7 +29,7 @@ router.get("/my/purchases", authMiddleware, async (req, res) => {
   }
 });
 
-// Create course (teacher only)
+// ✅ Create course (teacher only)
 router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
   try {
     if (req.user.role !== "teacher") {
@@ -57,7 +57,7 @@ router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
   }
 });
 
-// Get all courses
+// ✅ Get all courses
 router.get("/", async (req, res) => {
   try {
     const courses = await Course.find().populate("instructor", "name email");
@@ -67,21 +67,51 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Get single course by ID
-router.get("/:id", async (req, res) => {
+// ✅ Get all courses created by the logged-in teacher (with purchasers)
+// ⚠️ Put this BEFORE the dynamic `/:id` route
+router.get("/instructor", authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== "teacher") {
+      return res
+        .status(403)
+        .json({ message: "Only teachers can view their courses" });
+    }
+
+    const courses = await Course.find({ instructor: req.user.id })
+      .populate("instructor", "name email")
+      .populate("purchasers", "name email");
+
+    res.json(courses);
+  } catch (err) {
+    console.error("Error fetching instructor courses:", err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// ✅ Get single course by ID (with alreadyPurchased flag for students)
+router.get("/:id", authMiddleware, async (req, res) => {
   try {
     const course = await Course.findById(req.params.id).populate(
       "instructor",
       "name email"
     );
     if (!course) return res.status(404).json({ message: "Course not found" });
-    res.json(course);
+
+    let alreadyPurchased = false;
+    if (req.user.role === "student") {
+      const user = await User.findById(req.user.id);
+      if (user && user.purchasedCourses.some((id) => id.equals(course._id))) {
+        alreadyPurchased = true;
+      }
+    }
+
+    res.json({ ...course.toObject(), alreadyPurchased });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-// Buy course (student only)
+// ✅ Buy course (student only) → updates both user and course
 router.post("/:id/buy", authMiddleware, async (req, res) => {
   try {
     if (req.user.role !== "student") {
@@ -94,13 +124,16 @@ router.post("/:id/buy", authMiddleware, async (req, res) => {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    if (!Array.isArray(user.purchasedCourses)) {
-      user.purchasedCourses = [];
-    }
-
-    if (!user.purchasedCourses.includes(course._id)) {
+    // Add course to student's purchases
+    if (!user.purchasedCourses.some((id) => id.equals(course._id))) {
       user.purchasedCourses.push(course._id);
       await user.save();
+    }
+
+    // Add student to course purchasers
+    if (!course.purchasers.some((id) => id.equals(user._id))) {
+      course.purchasers.push(user._id);
+      await course.save();
     }
 
     res.json({ message: "Course purchased successfully", course });
@@ -110,17 +143,16 @@ router.post("/:id/buy", authMiddleware, async (req, res) => {
   }
 });
 
-// Get all students who purchased a specific course
+// ✅ Get all students who purchased a specific course
 router.get("/:id/purchasers", authMiddleware, async (req, res) => {
   try {
-    const course = await Course.findById(req.params.id);
-    if (!course) return res.status(404).json({ message: "Course not found" });
-
-    const purchasers = await User.find({ purchasedCourses: course._id }).select(
+    const course = await Course.findById(req.params.id).populate(
+      "purchasers",
       "name email role"
     );
+    if (!course) return res.status(404).json({ message: "Course not found" });
 
-    res.json({ course: course.title, purchasers });
+    res.json({ course: course.title, purchasers: course.purchasers });
   } catch (err) {
     console.error("Error fetching purchasers:", err);
     res.status(500).json({ message: err.message });

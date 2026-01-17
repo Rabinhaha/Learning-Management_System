@@ -84,13 +84,12 @@ export default function RegisterStudent() {
           {/* Course */}
           <div>
             <label className="block mb-1 font-semibold">
-              Course <span className="text-red-500">*</span>
+              Course <span className="text-red-500"></span>
             </label>
             <input
               name="course"
               value={form.course}
               onChange={handleChange}
-              required
               className="w-full p-2 rounded bg-gray-700 border border-gray-600"
             />
           </div>

@@ -11,8 +11,16 @@ const courseSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
-    imageUrl: { type: String }, // ✅ Cloudinary secure URL
-    imagePublicId: { type: String }, // ✅ Cloudinary public_id
+    imageUrl: { type: String }, // Cloudinary secure URL
+    imagePublicId: { type: String }, // Cloudinary public_id
+
+    // 👇 Track which students bought this course
+    purchasers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   { timestamps: true }
 );

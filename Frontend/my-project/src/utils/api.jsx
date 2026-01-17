@@ -176,3 +176,7 @@ export const updateStudentStatus = async (id, status) =>
     method: "PATCH",
     body: JSON.stringify({ status }),
   });
+
+// Get all courses purchased by the logged-in student
+export const getMyPurchases = async () =>
+  request("api/courses/my/purchases", { method: "GET" });
