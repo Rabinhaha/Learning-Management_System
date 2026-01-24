@@ -18,7 +18,7 @@ import AdminCreateStudent from "./pages/AdminCreateStudent";
 
 import Register from "./pages/RegisterTeacher";
 import RegisterStudent from "./pages/RegisterStudent";
-
+import StudentView from "./components/StudentView.jsx";
 function App() {
   return (
     <BrowserRouter>
@@ -104,6 +104,7 @@ function App() {
         <Route path="/courses/:id" element={<CourseDetail />} />
         <Route path="/courses/:id/buy" element={<BuyCourse />} />
         <Route path="/courses/:id/purchasers" element={<PurchasedCourses />} />
+        <Route path="/students/:id" element={<StudentView />} />
 
         {/* Student purchases */}
         <Route

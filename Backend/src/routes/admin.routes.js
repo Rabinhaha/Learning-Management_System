@@ -54,7 +54,7 @@ router.patch("/teachers/:id/status", async (req, res) => {
     const teacher = await User.findByIdAndUpdate(
       req.params.id,
       { status },
-      { new: true }
+      { new: true },
     );
     res.json(teacher);
   } catch (err) {
@@ -82,7 +82,7 @@ router.patch("/students/:id/status", async (req, res) => {
     const student = await User.findByIdAndUpdate(
       req.params.id,
       { status },
-      { new: true }
+      { new: true },
     );
     res.json(student);
   } catch (err) {
@@ -100,6 +100,19 @@ router.post("/users", async (req, res) => {
     res
       .status(400)
       .json({ message: "Error creating user", error: err.message });
+  }
+});
+// Get specific student by ID
+router.get("/students/:id", async (req, res) => {
+  try {
+    const student = await User.findOne({ _id: req.params.id, role: "student" });
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+    res.json(student);
+  } catch (err) {
+    console.error("Error fetching student:", err);
+    res.status(500).json({ message: "Error fetching student" });
   }
 });
 

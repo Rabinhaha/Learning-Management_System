@@ -47,7 +47,7 @@ const request = async (endpoint, options = {}) => {
   if (!res.ok) {
     console.error("❌ API Error:", res.status, data.message || data.errors);
     throw new Error(
-      data.message || data.errors?.join(", ") || "Something went wrong"
+      data.message || data.errors?.join(", ") || "Something went wrong",
     );
   }
 
@@ -180,3 +180,7 @@ export const updateStudentStatus = async (id, status) =>
 // Get all courses purchased by the logged-in student
 export const getMyPurchases = async () =>
   request("api/courses/my/purchases", { method: "GET" });
+
+// Get a specific student by ID
+export const getStudentById = async (id) =>
+  request(`api/admin/students/${id}`, { method: "GET" });
