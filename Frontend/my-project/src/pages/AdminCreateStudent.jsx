@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar.jsx";
-import { getStudents, updateStudentStatus } from "../utils/api.jsx"; // ✅ new helpers
+import { getStudents, updateStudentStatus } from "../utils/api.jsx"; // ✅ helpers
 
 export default function StudentListOnly() {
   const [students, setStudents] = useState([]);
@@ -27,7 +27,7 @@ export default function StudentListOnly() {
     try {
       await updateStudentStatus(id, "approved");
       setStudents((prev) =>
-        prev.map((s) => (s._id === id ? { ...s, status: "approved" } : s))
+        prev.map((s) => (s._id === id ? { ...s, status: "approved" } : s)),
       );
     } catch (err) {
       alert("Failed to approve student");
@@ -52,6 +52,8 @@ export default function StudentListOnly() {
 
         {loading ? (
           <p>Loading students...</p>
+        ) : error ? (
+          <p className="text-red-500">{error}</p>
         ) : students.length === 0 ? (
           <p className="text-gray-400">No students found.</p>
         ) : (
@@ -86,7 +88,16 @@ export default function StudentListOnly() {
                         {student.status}
                       </span>
                     </td>
-                    <td className="px-4 py-2">
+                    <td className="px-4 py-2 flex gap-2">
+                      {/* ✅ View button */}
+                      <button
+                        onClick={() => navigate(`/students/${student._id}`)}
+                        className="bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded text-xs"
+                      >
+                        View
+                      </button>
+
+                      {/* ✅ Approve button (only if not approved) */}
                       {student.status !== "approved" && (
                         <button
                           onClick={() => handleApprove(student._id)}
